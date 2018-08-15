@@ -32,13 +32,14 @@
                <children>
                   <ListView fx:id="foodLVFoodTab" layoutX="39.0" layoutY="24.0" prefHeight="261.0" prefWidth="715.0" />
                   <Button fx:id="deleteButton" layoutX="431.0" layoutY="306.0" mnemonicParsing="false" text="delete" />
-                  <Button fx:id="addFoodButton" layoutX="693.0" layoutY="457.0" mnemonicParsing="false" text="add" />
+                  <Button fx:id="addFoodButton" layoutX="693.0" layoutY="457.0" mnemonicParsing="false" onAction="#addFoodButtonAction" text="add" />
                   <TextField fx:id="searchFoodFieldFoodTab" layoutX="39.0" layoutY="306.0" prefHeight="31.0" prefWidth="371.0" promptText="food" />
                   <TextField fx:id="foodNameField" layoutX="39.0" layoutY="400.0" promptText="food's name" />
-                  <TextField fx:id="fatField" layoutX="39.0" layoutY="457.0" promptText="fat/100g" />
-                  <TextField fx:id="carbField" layoutX="260.0" layoutY="457.0" promptText="carbs/100g" />
-                  <TextField fx:id="proteinField" layoutX="472.0" layoutY="457.0" promptText="protein/100g" />
+                  <TextField fx:id="fatField" layoutX="39.0" layoutY="457.0" prefHeight="31.0" prefWidth="118.0" promptText="fat/100g" />
+                  <TextField fx:id="carbField" layoutX="197.0" layoutY="463.0" prefHeight="31.0" prefWidth="113.0" promptText="carbs/100g" />
+                  <TextField fx:id="proteinField" layoutX="328.0" layoutY="457.0" prefHeight="31.0" prefWidth="114.0" promptText="protein/100g" />
                   <Button fx:id="cancelAddFoodButton" layoutX="684.0" layoutY="512.0" mnemonicParsing="false" text="cancel" />
+                  <TextField fx:id="calsField" layoutX="462.0" layoutY="463.0" promptText="calories/100g" />
                </children>
             </AnchorPane>
          </content>
