@@ -18,6 +18,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyEvent;
 
 /**
  * FXML Controller class
@@ -36,8 +38,6 @@ public class CaloriesCounterController implements Initializable {
     private ComboBox<Integer> yearCB;
     @FXML
     private TextField searchFoodField;
-    @FXML
-    private ComboBox<String> foodCB;
     @FXML
     private ListView<String> foodLV;
     @FXML
@@ -71,6 +71,12 @@ public class CaloriesCounterController implements Initializable {
     @FXML
     private TextField calsField;
     private ArrayList<Food> foods = new ArrayList<>();
+    @FXML
+    private ListView<?> foodIntakeLV;
+    @FXML
+    private Button addButton;
+    @FXML
+    private TextField amountField;
 
 
     /**
@@ -79,8 +85,8 @@ public class CaloriesCounterController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         dbc.connect();
+        updateFoodLV();
         
-        //dbc.getFoods();
         int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
         for (int i = 1; i < 32; i++) {
             dayCB.getItems().add(i);
@@ -120,11 +126,86 @@ public class CaloriesCounterController implements Initializable {
                 float cals = Float.valueOf(calsField.getText());
                 String foodName = foodNameField.getText();
                 
+                fatField.clear();
+                carbField.clear();
+                proteinField.clear();
+                calsField.clear();
+                foodNameField.clear();
+                
                 Food food = new Food(foodName, fat, carbs, prot, cals);
+                dbc.addFood(food);
                 dbc.insertFood(foodName, fat, carbs, prot, cals);
-                System.out.println("kaikki ok");
+                
+                updateFoodLV();
             }
         }
+    }
+
+    @FXML
+    private void deleteButtonAction(ActionEvent event) {
+        String[] foodData = foodLVFoodTab.getSelectionModel().getSelectedItem().split(",");
+        String[] calsTemp = foodData[1].split(" ");
+        //System.out.println(foodData[0] + calsTemp[1]);
+        Food food = null;
+        
+        
+        for (Food f: dbc.getFoods()) {
+            if ((f.getName().equals(foodData[0])) && (f.getCals() == Float.valueOf(calsTemp[1]))) {
+                food = f;
+                break;
+            }
+        }
+        
+        dbc.deleteFood(food);
+        dbc.removeFood(food);
+        
+        updateFoodLV();
+        
+    }
+    
+    private void updateFoodLV() {
+        foodLVFoodTab.getItems().clear();
+        for (Food f: dbc.getFoods()) {
+            foodLVFoodTab.getItems().add(
+                    f.getName() + ", "
+                   +f.getCals() + " cals, "
+                   +f.getFat() + " fat , "
+                  + f.getCarbs() + " carbs, "
+                  + f.getProt() + " protein "
+            );
+        }
+    }
+
+
+    @FXML
+    private void searchFoodFieldFoodTabKeyReleased(KeyEvent event) {
+        foodLVFoodTab.getItems().clear();
+        String s = searchFoodFieldFoodTab.getText();
+        for (Food f: dbc.getFoods()) {
+            if (s.length() > f.getName().length()) {
+                continue;
+            }
+            for (int i = 0; i < f.getName().length() - s.length() + 1; i++) {
+                if (s.matches(f.getName().substring(i, i + s.length()))) {
+                    foodLVFoodTab.getItems().add(
+                        f.getName() + ", "
+                       +f.getCals() + " cals, "
+                       +f.getFat() + " fat , "
+                      + f.getCarbs() + " carbs, "
+                      + f.getProt() + " protein "
+                    );
+                    break;
+                }
+            }
+        }
+    }
+
+    @FXML
+    private void searchFoodKeyReleased(KeyEvent event) {
+    }
+
+    @FXML
+    private void addButtonAction(ActionEvent event) {
     }
     
 }
