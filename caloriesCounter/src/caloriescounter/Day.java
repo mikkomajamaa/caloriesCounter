@@ -12,17 +12,49 @@ import java.util.Date;
  * @author mikko
  */
 public class Day {
-    private Date date;
+    private int day;
+    private int month;
+    private int year;
     private float cals;
     private float fat;
     private float carbs;
     private float protein;
     
-    public Day(Date d, float cal, float f, float car, float p) {
-        date = d;
+    public Day(int d, int m, int y, float cal, float f, float car, float p) {
+        day = d;
+        month = m;
+        year = y;
         cals = cal;
         fat = f;
         carbs = car;
         protein = p;
+    }
+    
+    public int getDay() {
+        return day;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public float getCals() {
+        return cals;
+    }
+
+    public float getFat() {
+        return fat;
+    }
+
+    public float getCarbs() {
+        return carbs;
+    }
+
+    public float getProtein() {
+        return protein;
     }
 }

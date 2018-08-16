@@ -25,6 +25,8 @@ public class DBConnection {
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
     private ArrayList<Food> foods = null;
+    private ArrayList<Addition> additions = null;
+    private ArrayList<Day> days = null;
     private static DBConnection instance = null;
     
     protected DBConnection() {
@@ -35,14 +37,13 @@ public class DBConnection {
             instance = new DBConnection();
         }
         return instance;
-
     }
     
     
     public void connect() {
         try {
             //db parameters
-            String url = "jdbc:sqlite:C:\\Users\\mikko\\sqlite-tools-win32-x86-3240000\\cal";
+            String url = "jdbc:sqlite:C:\\Users\\mikko\\sqlite-tools-win32-x86-3240000\\asd";
             //create a connection to the database
             conn = DriverManager.getConnection(url);
         } catch (SQLException e) {
@@ -64,6 +65,7 @@ public class DBConnection {
             Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
     
     public void deleteFood(Food f) {
        try {
@@ -106,6 +108,66 @@ public class DBConnection {
         return null;
     }
     
+    public void insertDaysFoods(int day, int month, int year, int fId, float amount) {
+        
+    }
+    
+    public void addAddition(Addition a) {
+        if (additions == null) {
+            additions = new ArrayList<>();
+        }
+        additions.add(a);
+    }
+    
+    public void insertAddition(int d, int m, int y, int fId, float amount) {
+        try {
+            SQL = "INSERT INTO days_food VALUES (?,?,?)";
+            String date = d + "-" + m + "-" + y;
+            stmt = conn.prepareStatement(SQL);
+            stmt.setString(1, date);
+            stmt.setFloat(2, fId);
+            stmt.setFloat(3, amount);
+            stmt.execute();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    public ArrayList<Addition> getAdditions() {
+        if (additions == null) {
+            try {
+                additions = new ArrayList<>();
+                SQL = "SELECT * FROM days_food INNER JOIN food ON food.f_id = days_food.f_id;";
+                stmt = conn.prepareStatement(SQL);
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String[] date = rs.getString("day").split("-");
+                    int day = Integer.valueOf(date[0]);
+                    int month = Integer.valueOf(date[1]);
+                    int year = Integer.valueOf(date[2]);
+                    
+                    Addition a = new Addition(rs.getInt("f_id"),
+                                                rs.getString("name"),
+                                                rs.getFloat("amount"),
+                                                rs.getFloat("cals"),
+                                                rs.getFloat("fat"),
+                                                rs.getFloat("carb"),
+                                                rs.getFloat("prot"),
+                                                day,
+                                                month,
+                                                year
+                    );
+                    additions.add(a);                   
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        return additions;
+    }
+    
     public void addFood(Food f) {
         this.foods.add(f);
     }
@@ -119,5 +181,58 @@ public class DBConnection {
         }
     }
     
+    public void insertDay(int d, int m, int y, float ca, float f, float car, float prot) {
+        try {
+            String date = d + "-" + m + "-" + y;
+            String SQLInit = "DELETE FROM days WHERE day = ?";
+            stmt = conn.prepareStatement(SQLInit);
+            stmt.setString(1, date);
+            stmt.execute();
+            
+            SQL = "INSERT INTO days (day, cals, fat, carb, prot) VALUES (?,?,?,?,?)";
+            stmt = conn.prepareStatement(SQL);
+            stmt.setString(1, date);
+            stmt.setFloat(2, ca);
+            stmt.setFloat(3, f);
+            stmt.setFloat(4, car);
+            stmt.setFloat(5, prot);
+            stmt.execute();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public ArrayList<Day> getDays() {
+        if (days == null) {
+            try {
+                days = new ArrayList<>();
+                SQL = "SELECT * FROM days";
+                stmt = conn.prepareStatement(SQL);
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String[] date = rs.getString("day").split("-");
+                    int day = Integer.valueOf(date[0]);
+                    int month = Integer.valueOf(date[1]);
+                    int year = Integer.valueOf(date[2]);
+                    Day d = new Day(day, 
+                                    month, 
+                                    year, 
+                                    rs.getFloat("cals"), 
+                                    rs.getFloat("fat"), 
+                                    rs.getFloat("carb"), 
+                                    rs.getFloat("prot"));
+                    days.add(d);
+                }
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return days;
+    }
+    
+    public void addDay(Day d) {
+        days.add(d);
+    }
     
 }

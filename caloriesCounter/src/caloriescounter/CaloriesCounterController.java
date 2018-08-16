@@ -8,6 +8,7 @@ package caloriescounter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import javafx.event.ActionEvent;
@@ -73,7 +74,7 @@ public class CaloriesCounterController implements Initializable {
     private TextField calsField;
     private ArrayList<Food> foods = new ArrayList<>();
     @FXML
-    private ListView<?> foodIntakeLV;
+    private ListView<String> foodIntakeLV;
     @FXML
     private Button addButton;
     @FXML
@@ -86,7 +87,9 @@ public class CaloriesCounterController implements Initializable {
     private boolean proteinOk = false;
     private int foodId = 1;
     private Food food;
-
+    private boolean foodSelected = false;
+    private boolean amountEntered = false;
+    private boolean bwEntered = false;
 
     /**
      * Initializes the controller class.
@@ -116,9 +119,13 @@ public class CaloriesCounterController implements Initializable {
         }
         yearCB.setValue(year);
         
+        updateFoodIntakeLV();
+        
         addFoodButton.setDisable(true);
         cancelAddFoodButton.setDisable(true);
         deleteButton.setDisable(true);
+        bwButton.setDisable(true);
+        addButton.setDisable(true);
     }    
 
     @FXML
@@ -200,6 +207,7 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void searchFoodFieldFoodTabKeyReleased(KeyEvent event) {
+        deleteButton.setDisable(true);
         foodLVFoodTab.getItems().clear();
         String s = searchFoodFieldFoodTab.getText();
         for (Food f: dbc.getFoods()) {
@@ -242,12 +250,77 @@ public class CaloriesCounterController implements Initializable {
                 }
             }
         }
-                
-                
     }
 
     @FXML
     private void addButtonAction(ActionEvent event) {
+        String[] foodData = foodLV.getSelectionModel().getSelectedItem().split(",");
+        String foodName = foodData[0];
+        int foodId = -1;
+        int day = dayCB.getSelectionModel().getSelectedItem();
+        int month = monthCB.getSelectionModel().getSelectedIndex() + 1;
+        int year = yearCB.getSelectionModel().getSelectedItem();
+        float amount = Float.valueOf(amountField.getText());
+        float cals = -1;
+        float fat = -1;
+        float carbs = -1;
+        float protein = -1;
+        
+        for (Food f: dbc.getFoods()) {
+            String[] columnData1 = foodData[1].split(" ");
+            cals = Float.valueOf(columnData1[1]);
+            
+            String[] columnData2 = foodData[2].split(" ");
+            fat = Float.valueOf(columnData2[1]);
+            
+            String[] columnData3 = foodData[3].split(" ");
+            carbs = Float.valueOf(columnData3[1]);
+            
+            String[] columnData4 = foodData[4].split(" ");
+            protein = Float.valueOf(columnData4[1]);
+
+            if (f.getName().equals(foodData[0])
+             && (f.getCals() == Float.valueOf(columnData1[1]))
+                    && (f.getFat() == Float.valueOf(columnData2[1]))
+                    && (f.getCarbs() == Float.valueOf(columnData3[1]))
+                    && (f.getProt() == Float.valueOf(columnData4[1]))){
+                foodId = f.getfId();
+            }
+        }
+        
+        Addition a = new Addition(foodId,
+                                    foodName,
+                                    amount,
+                                    cals * (amount / 100),
+                                    fat * (amount / 100),
+                                    carbs * (amount / 100),
+                                    protein * (amount / 100),
+                                    day,
+                                    month,
+                                    year
+        );
+        
+        dbc.addAddition(a);
+        dbc.insertAddition(day, month, year, foodId, amount);
+        
+        float calsTotal = 0;
+        float fatTotal = 0;
+        float carbsTotal = 0;
+        float proteinTotal = 0;
+        for (Addition ad: dbc.getAdditions()) {
+            if ((ad.getDay() == day) && (ad.getMonth() == month) && (ad.getYear() == year)) {
+                calsTotal += ad.getCal();
+                fatTotal += ad.getFat();
+                carbsTotal += ad.getCarbs();
+                proteinTotal += ad.getProtein();
+            }
+        }
+        Day d = new Day(day, month, year, fat, fat, carbs, protein);
+        dbc.addDay(d);
+        dbc.insertDay(day, month, year, fat, fat, carbs, protein);
+        
+        updateFoodIntakeLV();
+        
     }
 
     @FXML
@@ -341,7 +414,99 @@ public class CaloriesCounterController implements Initializable {
     private void foodTabLVClicked(MouseEvent event) {
         if (!foodLVFoodTab.getSelectionModel().isEmpty()) {
             deleteButton.setDisable(false);
+        } else {
+            deleteButton.setDisable(true);
         }
     }
+
+    @FXML
+    private void bwFieldKeyReleased(KeyEvent event) {
+        if (!bwField.getText().trim().isEmpty() &&
+                Pattern.matches(pattern, bwField.getText())) {
+            bwButton.setDisable(false);
+        } else {
+            bwButton.setDisable(true);
+        }
+    }
+
+    @FXML
+    private void foodLVClicked(MouseEvent event) {
+        if (!foodLV.getSelectionModel().isEmpty()) {
+            foodSelected = true;
+        } else {
+            foodSelected = false;
+        }
+        
+        if (foodSelected && amountEntered) {
+            addButton.setDisable(false);
+        } else {
+            addButton.setDisable(true);
+        }
+    }
+
+    @FXML
+    private void amountFieldKeyReleased(KeyEvent event) {
+        if (!amountField.getText().trim().isEmpty() &&
+                Pattern.matches(pattern, amountField.getText())) {
+            amountEntered = true;
+        } else {
+            amountEntered = false;
+        }
+        
+        if (!foodLV.getSelectionModel().isEmpty() && amountEntered) {
+            addButton.setDisable(false);
+        } else {
+            addButton.setDisable(true);
+        }
+    }
+
+
+
+    @FXML
+    private void dayCBAction(ActionEvent event) {
+        updateFoodIntakeLV();
+    }
+
+    @FXML
+    private void monthCBAction(ActionEvent event) {
+        updateFoodIntakeLV();
+    }
+
+    @FXML
+    private void yearCBAction(ActionEvent event) {
+        updateFoodIntakeLV();
+    }
     
+    private void updateFoodIntakeLV() {
+        foodIntakeLV.getItems().clear();
+        for (Addition a: dbc.getAdditions()) {
+            if ((a.getDay() == dayCB.getSelectionModel().getSelectedItem())
+                    && (a.getMonth() == monthCB.getSelectionModel().getSelectedIndex() + 1)
+                    && (a.getYear() == yearCB.getSelectionModel().getSelectedItem())) {
+                foodIntakeLV.getItems().add(a.getFoodName() + ", " +
+                                        a.getAmount() + "g, " +
+                                        a.getCal() + "cals, " +
+                                        a.getFat() + "g fat, " +
+                                        a.getCarbs() + "g carbs, " +
+                                        a.getProtein() + "g prot");
+                
+            }
+        }
+        for (Day d: dbc.getDays()) {
+//            System.out.println("päivää");
+//            System.out.println(d.getDay());
+//            System.out.println(d.getMonth());
+//            System.out.println(d.getYear());
+            if ((d.getDay() == dayCB.getSelectionModel().getSelectedItem())
+                    && (d.getMonth() == monthCB.getSelectionModel().getSelectedIndex() + 1)
+                    && (d.getYear() == yearCB.getSelectionModel().getSelectedItem())) {
+                System.out.println("asd");
+                foodIntakeLV.getItems().add("total: " + 
+                                            d.getCals() + "cals" +
+                                            d.getFat() + "g fat" +
+                                            d.getCarbs() + "g carbs, " +
+                                            d.getProtein() + "g prot");
+            }
+        }
+    }
 }
