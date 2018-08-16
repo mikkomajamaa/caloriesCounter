@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,14 +65,26 @@ public class DBConnection {
         }
     }
     
+    public void deleteFood(Food f) {
+       try {
+            SQL = "DELETE FROM food WHERE name = ? AND cals = ?";
+            stmt = this.conn.prepareStatement(SQL);
+            stmt.setString(1, f.getName());
+            stmt.setFloat(2, f.getCals());
+            stmt.execute();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+    }
+    
     public ArrayList<Food> getFoods() {
         if (foods == null) {
+            foods = new ArrayList<>();
             try {
                 SQL = "SELECT * FROM food";
-                stmt = this.conn.prepareStatement(SQL);
+                stmt = conn.prepareStatement(SQL);
                 rs = stmt.executeQuery();
                 while (rs.next()) {
-                    System.out.println("moi");
                     Food f = new Food(
                             rs.getString("name"),
                             rs.getFloat("fat"),
@@ -91,5 +104,20 @@ public class DBConnection {
         }
         return null;
     }
+    
+    public void addFood(Food f) {
+        this.foods.add(f);
+    }
+    
+    public void removeFood(Food f) {
+        Iterator<Food> it = foods.iterator();
+        while (it.hasNext()) {
+            if (it.next().equals(f));
+                it.remove();
+                return;
+            }
+        
+    }
+    
     
 }
