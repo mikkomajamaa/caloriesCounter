@@ -20,6 +20,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 /**
  * FXML Controller class
@@ -77,6 +78,14 @@ public class CaloriesCounterController implements Initializable {
     private Button addButton;
     @FXML
     private TextField amountField;
+    private String pattern = "\\d*?\\.?\\d+";
+    private boolean foodNameOk = false;
+    private boolean calsOk = false;
+    private boolean fatOk = false;
+    private boolean carbsOk = false;
+    private boolean proteinOk = false;
+    private int foodId = 1;
+    private Food food;
 
 
     /**
@@ -106,48 +115,48 @@ public class CaloriesCounterController implements Initializable {
             yearCB.getItems().add(year - 5 + i);
         }
         yearCB.setValue(year);
+        
+        addFoodButton.setDisable(true);
+        cancelAddFoodButton.setDisable(true);
+        deleteButton.setDisable(true);
     }    
 
     @FXML
     private void addFoodButtonAction(ActionEvent event) {
-        String pattern = "\\d*?\\.?\\d+";
-        if (!fatField.getText().trim().isEmpty()
-                && !carbField.getText().trim().isEmpty()
-                && !proteinField.getText().trim().isEmpty()
-                && !foodNameField.getText().trim().isEmpty()
-                && !calsField.getText().trim().isEmpty()) {
-            if (Pattern.matches(pattern, fatField.getText())
-                    && Pattern.matches(pattern, carbField.getText())
-                    && Pattern.matches(pattern, proteinField.getText())
-                    && Pattern.matches(pattern, calsField.getText())) {
-                float fat = Float.valueOf(fatField.getText());
-                float carbs = Float.valueOf(carbField.getText());
-                float prot = Float.valueOf(proteinField.getText());
-                float cals = Float.valueOf(calsField.getText());
-                String foodName = foodNameField.getText();
-                
-                fatField.clear();
-                carbField.clear();
-                proteinField.clear();
-                calsField.clear();
-                foodNameField.clear();
-                
-                Food food = new Food(foodName, fat, carbs, prot, cals);
-                dbc.addFood(food);
-                dbc.insertFood(foodName, fat, carbs, prot, cals);
-                
-                updateFoodLV();
-            }
-        }
+        float fat = Float.valueOf(fatField.getText());
+        float carbs = Float.valueOf(carbField.getText());
+        float prot = Float.valueOf(proteinField.getText());
+        float cals = Float.valueOf(calsField.getText());
+        String foodName = foodNameField.getText();
+
+        fatField.clear();
+        carbField.clear();
+        proteinField.clear();
+        calsField.clear();
+        foodNameField.clear();
+
+        food = new Food(foodId++, foodName, fat, carbs, prot, cals);
+        dbc.addFood(food);
+        dbc.insertFood(foodName, fat, carbs, prot, cals);
+
+        updateFoodLV();
+        addFoodButton.setDisable(true);
+        cancelAddFoodButton.setDisable(false);
+        deleteButton.setDisable(true);
+        foodNameOk = false;
+        calsOk = false;
+        fatOk = false;
+        carbsOk = false;
+        proteinOk = false;
+
     }
 
     @FXML
     private void deleteButtonAction(ActionEvent event) {
         String[] foodData = foodLVFoodTab.getSelectionModel().getSelectedItem().split(",");
         String[] calsTemp = foodData[1].split(" ");
-        //System.out.println(foodData[0] + calsTemp[1]);
+
         Food food = null;
-        
         
         for (Food f: dbc.getFoods()) {
             if ((f.getName().equals(foodData[0])) && (f.getCals() == Float.valueOf(calsTemp[1]))) {
@@ -161,12 +170,24 @@ public class CaloriesCounterController implements Initializable {
         
         updateFoodLV();
         
+        deleteButton.setDisable(true);
+        cancelAddFoodButton.setDisable(true);
+        
     }
     
     private void updateFoodLV() {
         foodLVFoodTab.getItems().clear();
+        foodLV.getItems().clear();
         for (Food f: dbc.getFoods()) {
+            foodId = f.getfId() + 1;
             foodLVFoodTab.getItems().add(
+                    f.getName() + ", "
+                   +f.getCals() + " cals, "
+                   +f.getFat() + " fat , "
+                  + f.getCarbs() + " carbs, "
+                  + f.getProt() + " protein "
+            );
+            foodLV.getItems().add(
                     f.getName() + ", "
                    +f.getCals() + " cals, "
                    +f.getFat() + " fat , "
@@ -202,10 +223,125 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void searchFoodKeyReleased(KeyEvent event) {
+        foodLV.getItems().clear();
+        String s = searchFoodField.getText();
+        for (Food f: dbc.getFoods()) {
+            if (s.length() > f.getName().length()) {
+                continue;
+            }
+            for (int i = 0; i < f.getName().length() - s.length() + 1; i++) {
+                if (s.matches(f.getName().substring(i, i + s.length()))) {
+                    foodLV.getItems().add(
+                        f.getName() + ", "
+                       +f.getCals() + " cals, "
+                       +f.getFat() + " fat , "
+                      + f.getCarbs() + " carbs, "
+                      + f.getProt() + " protein "
+                    );
+                    break;
+                }
+            }
+        }
+                
+                
     }
 
     @FXML
     private void addButtonAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void foodNameFieldKeyReleased(KeyEvent event) {
+        if (!foodNameField.getText().trim().isEmpty()) {
+            foodNameOk = true;
+        } else {
+            foodNameOk = false;
+        }
+        
+        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+            addFoodButton.setDisable(false);
+        } else {
+            addFoodButton.setDisable(true);
+        }
+    }
+
+    @FXML
+    private void calsFieldKeyReleased(KeyEvent event) {
+        if (!calsField.getText().trim().isEmpty()
+                && Pattern.matches(pattern, calsField.getText())) {
+            calsOk = true;
+        } else {
+            calsOk = false;
+        }
+        
+        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+            addFoodButton.setDisable(false);
+        } else {
+            addFoodButton.setDisable(true);
+        }
+    }
+
+    @FXML
+    private void fatFieldKeyReleased(KeyEvent event) {
+        if (!fatField.getText().trim().isEmpty()
+                && Pattern.matches(pattern, fatField.getText())) {
+            fatOk = true;
+        } else {
+            fatOk = false;
+        }
+        
+        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+            addFoodButton.setDisable(false);
+        } else {
+            addFoodButton.setDisable(true);
+        }
+    }
+
+    @FXML
+    private void carbFieldKeyReleased(KeyEvent event) {
+        if (!carbField.getText().trim().isEmpty()
+                && Pattern.matches(pattern, carbField.getText())) {
+            carbsOk = true;
+        } else {
+            carbsOk = false;
+        }
+        
+        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+            addFoodButton.setDisable(false);
+        } else {
+            addFoodButton.setDisable(true);
+        }
+}
+
+    @FXML
+    private void proteinFieldKeyReleased(KeyEvent event) {
+        if (!proteinField.getText().trim().isEmpty()
+                && Pattern.matches(pattern, proteinField.getText())) {
+            proteinOk = true;
+        } else {
+            proteinOk = false;
+        }
+        
+        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+            addFoodButton.setDisable(false);
+        } else {
+            addFoodButton.setDisable(true);
+        }
+    }
+
+    @FXML
+    private void cancelAddFoodButtonAction(ActionEvent event) {
+        dbc.removeFood(food);
+        dbc.deleteFood(food);
+        cancelAddFoodButton.setDisable(true);
+        updateFoodLV();
+    }
+
+    @FXML
+    private void foodTabLVClicked(MouseEvent event) {
+        if (!foodLVFoodTab.getSelectionModel().isEmpty()) {
+            deleteButton.setDisable(false);
+        }
     }
     
 }

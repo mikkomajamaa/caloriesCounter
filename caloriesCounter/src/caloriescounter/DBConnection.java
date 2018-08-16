@@ -86,6 +86,7 @@ public class DBConnection {
                 rs = stmt.executeQuery();
                 while (rs.next()) {
                     Food f = new Food(
+                            rs.getInt("f_id"),
                             rs.getString("name"),
                             rs.getFloat("fat"),
                             rs.getFloat("carb"),
@@ -112,11 +113,10 @@ public class DBConnection {
     public void removeFood(Food f) {
         Iterator<Food> it = foods.iterator();
         while (it.hasNext()) {
-            if (it.next().equals(f));
+            if (it.next().getfId() == f.getfId()) {
                 it.remove();
-                return;
             }
-        
+        }
     }
     
     

@@ -10,18 +10,28 @@ package caloriescounter;
  * @author mikko
  */
 class Food {
+    private int fId;
     private String name;
     private float fat;
     private float carbs;
     private float prot;
     private float cals;
     
-    public Food(String n, float fa, float ca, float pr, float cal) {
+    public Food(int id, String n, float fa, float ca, float pr, float cal) {
+        fId = id;
         name = n;
         fat = fa;
         carbs = ca;
         prot = pr;
         cals = cal;
+    }
+    
+    public int getfId() {
+        return fId;
+    }
+
+    public void setfId(int fId) {
+        this.fId = fId;
     }
     
     public String getName() {
