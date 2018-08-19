@@ -14,7 +14,7 @@
    <tabs>
       <Tab fx:id="mainTab" text="main">
          <content>
-            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="594.0" prefWidth="718.0">
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="594.0" prefWidth="784.0">
                <children>
                   <ComboBox fx:id="dayCB" layoutX="22.0" layoutY="23.0" onAction="#dayCBAction" prefWidth="150.0" promptText="day" />
                   <ComboBox fx:id="monthCB" layoutX="199.0" layoutY="23.0" onAction="#monthCBAction" prefWidth="150.0" promptText="month" />
@@ -24,8 +24,6 @@
                   <TextField fx:id="searchFoodField" layoutX="16.0" layoutY="512.0" onKeyReleased="#searchFoodKeyReleased" promptText="search food" />
                   <TextField fx:id="amountField" layoutX="237.0" layoutY="512.0" onKeyReleased="#amountFieldKeyReleased" promptText="amount" />
                   <Button fx:id="addButton" layoutX="481.0" layoutY="512.0" mnemonicParsing="false" onAction="#addButtonAction" text="add" />
-                  <TextField fx:id="bwField" layoutX="579.0" layoutY="137.0" onKeyReleased="#bwFieldKeyReleased" prefHeight="31.0" prefWidth="74.0" promptText="bw" />
-                  <Button fx:id="bwButton" layoutX="592.0" layoutY="213.0" mnemonicParsing="false" text="insert" />
                   <Label layoutX="22.0" layoutY="77.0" text="food intake:">
                      <font>
                         <Font size="18.0" />
@@ -36,6 +34,7 @@
                         <Font size="18.0" />
                      </font>
                   </Label>
+                  <Button fx:id="toggleViewButton" layoutX="556.0" layoutY="250.0" mnemonicParsing="false" onAction="#toggleViewButtonClicked" text="toggle view" />
                </children>
             </AnchorPane>
          </content>
@@ -47,13 +46,13 @@
                   <ListView fx:id="foodLVFoodTab" layoutX="39.0" layoutY="24.0" onMouseClicked="#foodTabLVClicked" prefHeight="261.0" prefWidth="715.0" />
                   <TextField fx:id="searchFoodFieldFoodTab" layoutX="39.0" layoutY="306.0" onKeyReleased="#searchFoodFieldFoodTabKeyReleased" prefHeight="31.0" prefWidth="371.0" promptText="food" />
                   <Button fx:id="deleteButton" layoutX="431.0" layoutY="306.0" mnemonicParsing="false" onAction="#deleteButtonAction" text="delete" />
-                  <TextField fx:id="foodNameField" layoutX="39.0" layoutY="400.0" onKeyReleased="#foodNameFieldKeyReleased" promptText="food's name" />
-                  <TextField fx:id="calsField" layoutX="39.0" layoutY="457.0" onKeyReleased="#calsFieldKeyReleased" prefHeight="31.0" prefWidth="118.0" promptText="calories/100g" />
-                  <TextField fx:id="fatField" layoutX="197.0" layoutY="463.0" onKeyReleased="#fatFieldKeyReleased" prefHeight="31.0" prefWidth="113.0" promptText="fat/100g" />
-                  <TextField fx:id="carbField" layoutX="328.0" layoutY="457.0" onKeyReleased="#carbFieldKeyReleased" prefHeight="31.0" prefWidth="114.0" promptText="carbs/100g" />
-                  <TextField fx:id="proteinField" layoutX="462.0" layoutY="463.0" onKeyReleased="#proteinFieldKeyReleased" promptText="protein/100g" />
-                  <Button fx:id="addFoodButton" layoutX="693.0" layoutY="457.0" mnemonicParsing="false" onAction="#addFoodButtonAction" text="add" />
-                  <Button fx:id="cancelAddFoodButton" layoutX="684.0" layoutY="512.0" mnemonicParsing="false" onAction="#cancelAddFoodButtonAction" text="cancel" />
+                  <TextField fx:id="foodNameField" layoutX="39.0" layoutY="400.0" onKeyReleased="#foodNameFieldKeyReleased" prefHeight="31.0" prefWidth="160.0" promptText="food's name" />
+                  <TextField fx:id="calsField" layoutX="39.0" layoutY="457.0" onKeyReleased="#calsFieldKeyReleased" prefHeight="31.0" prefWidth="110.0" promptText="calories/100g" />
+                  <TextField fx:id="fatField" layoutX="170.0" layoutY="457.0" onKeyReleased="#fatFieldKeyReleased" prefHeight="31.0" prefWidth="110.0" promptText="fat/100g" />
+                  <TextField fx:id="carbField" layoutX="300.0" layoutY="457.0" onKeyReleased="#carbFieldKeyReleased" prefHeight="31.0" prefWidth="110.0" promptText="carbs/100g" />
+                  <TextField fx:id="proteinField" layoutX="424.0" layoutY="457.0" onKeyReleased="#proteinFieldKeyReleased" prefHeight="31.0" prefWidth="110.0" promptText="protein/100g" />
+                  <Button fx:id="addFoodButton" layoutX="547.0" layoutY="457.0" mnemonicParsing="false" onAction="#addFoodButtonAction" text="add" />
+                  <Button fx:id="cancelAddFoodButton" layoutX="602.0" layoutY="457.0" mnemonicParsing="false" onAction="#cancelAddFoodButtonAction" text="cancel" />
                   
                </children>
             </AnchorPane>

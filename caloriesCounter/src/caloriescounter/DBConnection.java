@@ -26,7 +26,6 @@ public class DBConnection {
     private ResultSet rs = null;
     private ArrayList<Food> foods = null;
     private ArrayList<Addition> additions = null;
-    private ArrayList<Day> days = null;
     private static DBConnection instance = null;
     
     protected DBConnection() {
@@ -200,39 +199,5 @@ public class DBConnection {
         } catch (SQLException ex) {
             Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
-    public ArrayList<Day> getDays() {
-        if (days == null) {
-            try {
-                days = new ArrayList<>();
-                SQL = "SELECT * FROM days";
-                stmt = conn.prepareStatement(SQL);
-                rs = stmt.executeQuery();
-                while (rs.next()) {
-                    String[] date = rs.getString("day").split("-");
-                    int day = Integer.valueOf(date[0]);
-                    int month = Integer.valueOf(date[1]);
-                    int year = Integer.valueOf(date[2]);
-                    Day d = new Day(day, 
-                                    month, 
-                                    year, 
-                                    rs.getFloat("cals"), 
-                                    rs.getFloat("fat"), 
-                                    rs.getFloat("carb"), 
-                                    rs.getFloat("prot"));
-                    days.add(d);
-                }
-                
-            } catch (SQLException ex) {
-                Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return days;
-    }
-    
-    public void addDay(Day d) {
-        days.add(d);
-    }
-    
+    }    
 }

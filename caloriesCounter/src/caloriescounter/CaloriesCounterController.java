@@ -42,9 +42,7 @@ public class CaloriesCounterController implements Initializable {
     private TextField searchFoodField;
     @FXML
     private ListView<String> foodLV;
-    @FXML
     private Button bwButton;
-    @FXML
     private TextField bwField;
     @FXML
     private Tab foodTab;
@@ -90,6 +88,12 @@ public class CaloriesCounterController implements Initializable {
     private boolean foodSelected = false;
     private boolean amountEntered = false;
     private boolean bwEntered = false;
+    private Button dayViewButton;
+    private Button allDaysButton;
+    @FXML
+    private Button toggleViewButton;
+    private int year;
+    private boolean dailyView = true;
 
     /**
      * Initializes the controller class.
@@ -113,7 +117,7 @@ public class CaloriesCounterController implements Initializable {
         }
         monthCB.setValue(months[month]);
         
-        int year = Calendar.getInstance().get(Calendar.YEAR);
+        year = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = 0; i < 11; i++) {
             yearCB.getItems().add(year - 5 + i);
         }
@@ -124,8 +128,8 @@ public class CaloriesCounterController implements Initializable {
         addFoodButton.setDisable(true);
         cancelAddFoodButton.setDisable(true);
         deleteButton.setDisable(true);
-        bwButton.setDisable(true);
         addButton.setDisable(true);
+        cancelAddFoodButton.setDisable(true);
     }    
 
     @FXML
@@ -178,8 +182,6 @@ public class CaloriesCounterController implements Initializable {
         updateFoodLV();
         
         deleteButton.setDisable(true);
-        cancelAddFoodButton.setDisable(true);
-        
     }
     
     private void updateFoodLV() {
@@ -303,24 +305,7 @@ public class CaloriesCounterController implements Initializable {
         dbc.addAddition(a);
         dbc.insertAddition(day, month, year, foodId, amount);
         
-        float calsTotal = 0;
-        float fatTotal = 0;
-        float carbsTotal = 0;
-        float proteinTotal = 0;
-        for (Addition ad: dbc.getAdditions()) {
-            if ((ad.getDay() == day) && (ad.getMonth() == month) && (ad.getYear() == year)) {
-                calsTotal += ad.getCal();
-                fatTotal += ad.getFat();
-                carbsTotal += ad.getCarbs();
-                proteinTotal += ad.getProtein();
-            }
-        }
-        Day d = new Day(day, month, year, fat, fat, carbs, protein);
-        dbc.addDay(d);
-        dbc.insertDay(day, month, year, fat, fat, carbs, protein);
-        
         updateFoodIntakeLV();
-        
     }
 
     @FXML
@@ -419,7 +404,6 @@ public class CaloriesCounterController implements Initializable {
         }
     }
 
-    @FXML
     private void bwFieldKeyReleased(KeyEvent event) {
         if (!bwField.getText().trim().isEmpty() &&
                 Pattern.matches(pattern, bwField.getText())) {
@@ -479,10 +463,20 @@ public class CaloriesCounterController implements Initializable {
     
     private void updateFoodIntakeLV() {
         foodIntakeLV.getItems().clear();
+        float totalAmount = 0;
+        float totalCals = 0;
+        float totalFat = 0;
+        float totalCarbs = 0;
+        float totalProtein = 0;
         for (Addition a: dbc.getAdditions()) {
             if ((a.getDay() == dayCB.getSelectionModel().getSelectedItem())
                     && (a.getMonth() == monthCB.getSelectionModel().getSelectedIndex() + 1)
                     && (a.getYear() == yearCB.getSelectionModel().getSelectedItem())) {
+                totalAmount += a.getAmount();
+                totalCals += a.getCal();
+                totalFat += a.getFat();
+                totalCarbs += a.getCarbs();
+                totalProtein += a.getProtein();
                 foodIntakeLV.getItems().add(a.getFoodName() + ", " +
                                         a.getAmount() + "g, " +
                                         a.getCal() + "cals, " +
@@ -492,21 +486,61 @@ public class CaloriesCounterController implements Initializable {
                 
             }
         }
-        for (Day d: dbc.getDays()) {
-//            System.out.println("päivää");
-//            System.out.println(d.getDay());
-//            System.out.println(d.getMonth());
-//            System.out.println(d.getYear());
-            if ((d.getDay() == dayCB.getSelectionModel().getSelectedItem())
-                    && (d.getMonth() == monthCB.getSelectionModel().getSelectedIndex() + 1)
-                    && (d.getYear() == yearCB.getSelectionModel().getSelectedItem())) {
-                System.out.println("asd");
-                foodIntakeLV.getItems().add("total: " + 
-                                            d.getCals() + "cals" +
-                                            d.getFat() + "g fat" +
-                                            d.getCarbs() + "g carbs, " +
-                                            d.getProtein() + "g prot");
-            }
+        foodIntakeLV.getItems().add("Total: " + 
+                                totalAmount + "g, " +
+                                totalCals + "cals, " +
+                                totalFat + "g fat, " +
+                                totalCarbs + "g carbs, " +
+                                totalProtein + "g prot");
+    }
+
+    @FXML
+    private void toggleViewButtonClicked(ActionEvent event) {
+        
+        // CHECK IF DAY HAS ALREADY BEEN ADDED
+        
+        
+        if (dailyView) {
+            foodIntakeLV.getItems().clear();
+            float totalAmount = 0;
+            float totalCals = 0;
+            float totalFat = 0;
+            float totalCarbs = 0;
+            float totalProtein = 0;
+            for (Addition a: dbc.getAdditions()) {
+                int day = a.getDay();
+                int month = a.getMonth();
+                int year = a.getYear();
+
+                for (Addition ad: dbc.getAdditions()) {
+                    if ((ad.getDay() == day) && (ad.getMonth() == month) && (ad.getYear() == year)) {
+                        totalAmount += a.getAmount();
+                        totalCals += a.getCal();
+                        totalFat += a.getFat();
+                        totalCarbs += a.getCarbs();
+                        totalProtein += a.getProtein();
+                    }
+                }
+
+                foodIntakeLV.getItems().add("Date: " +
+                            day + "-" + month + "-" + year + ", " +
+                            "total: " + 
+                            totalAmount + "g, " +
+                            totalCals + "cals, " +
+                            totalFat + "g fat, " +
+                            totalCarbs + "g carbs, " +
+                            totalProtein + "g prot");
+                
+                totalAmount = 0;
+                totalCals = 0;
+                totalFat = 0;
+                totalCarbs = 0;
+                totalProtein = 0;
+                } 
+        dailyView = false;
+        } else {
+            updateFoodIntakeLV();
+            dailyView = true;
         }
     }
 }
