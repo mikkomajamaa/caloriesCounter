@@ -94,6 +94,8 @@ public class CaloriesCounterController implements Initializable {
     private Button toggleViewButton;
     private int year;
     private boolean dailyView = true;
+    private ArrayList<String> datesAdded = new ArrayList<>();
+    private ArrayList<String> datesData = new ArrayList<>();
 
     /**
      * Initializes the controller class.
@@ -130,6 +132,8 @@ public class CaloriesCounterController implements Initializable {
         deleteButton.setDisable(true);
         addButton.setDisable(true);
         cancelAddFoodButton.setDisable(true);
+        
+        getDayView();
     }    
 
     @FXML
@@ -499,9 +503,21 @@ public class CaloriesCounterController implements Initializable {
         
         // CHECK IF DAY HAS ALREADY BEEN ADDED
         
-        
         if (dailyView) {
             foodIntakeLV.getItems().clear();
+            for (String s: datesData) {
+                foodIntakeLV.getItems().add(s);
+            }
+            dailyView = false;
+        } else {
+            updateFoodIntakeLV();
+            dailyView = true;
+        }
+        
+        
+    }
+    
+    private void getDayView() {
             float totalAmount = 0;
             float totalCals = 0;
             float totalFat = 0;
@@ -511,6 +527,11 @@ public class CaloriesCounterController implements Initializable {
                 int day = a.getDay();
                 int month = a.getMonth();
                 int year = a.getYear();
+                String date = day + "-" + month + "-" + year;
+                if (datesAdded.contains(date)) {
+                    continue;
+                }
+                datesAdded.add(date);
 
                 for (Addition ad: dbc.getAdditions()) {
                     if ((ad.getDay() == day) && (ad.getMonth() == month) && (ad.getYear() == year)) {
@@ -522,7 +543,7 @@ public class CaloriesCounterController implements Initializable {
                     }
                 }
 
-                foodIntakeLV.getItems().add("Date: " +
+                datesData.add("Date: " +
                             day + "-" + month + "-" + year + ", " +
                             "total: " + 
                             totalAmount + "g, " +
@@ -536,11 +557,7 @@ public class CaloriesCounterController implements Initializable {
                 totalFat = 0;
                 totalCarbs = 0;
                 totalProtein = 0;
-                } 
-        dailyView = false;
-        } else {
-            updateFoodIntakeLV();
-            dailyView = true;
-        }
+                }
+
     }
 }
