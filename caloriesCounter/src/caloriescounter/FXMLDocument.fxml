@@ -19,11 +19,11 @@
                   <ComboBox fx:id="dayCB" layoutX="22.0" layoutY="23.0" onAction="#dayCBAction" prefWidth="150.0" promptText="day" />
                   <ComboBox fx:id="monthCB" layoutX="199.0" layoutY="23.0" onAction="#monthCBAction" prefWidth="150.0" promptText="month" />
                   <ComboBox fx:id="yearCB" layoutX="376.0" layoutY="23.0" onAction="#yearCBAction" prefWidth="150.0" promptText="year" />
-                  <ListView fx:id="foodIntakeLV" layoutX="17.0" layoutY="104.0" prefHeight="177.0" prefWidth="529.0" />
-                  <ListView fx:id="foodLV" layoutX="16.0" layoutY="323.0" onMouseClicked="#foodLVClicked" prefHeight="166.0" prefWidth="530.0" />
+                  <ListView fx:id="foodIntakeLV" layoutX="17.0" layoutY="104.0" prefHeight="180.0" prefWidth="750.0" />
+                  <ListView fx:id="foodLV" layoutX="16.0" layoutY="323.0" onMouseClicked="#foodLVClicked" prefHeight="160.0" prefWidth="750.0" />
                   <TextField fx:id="searchFoodField" layoutX="16.0" layoutY="512.0" onKeyReleased="#searchFoodKeyReleased" promptText="search food" />
                   <TextField fx:id="amountField" layoutX="237.0" layoutY="512.0" onKeyReleased="#amountFieldKeyReleased" promptText="amount" />
-                  <Button fx:id="addButton" layoutX="481.0" layoutY="512.0" mnemonicParsing="false" onAction="#addButtonAction" text="add" />
+                  <Button fx:id="addButton" layoutX="720.0" layoutY="512.0" mnemonicParsing="false" onAction="#addButtonAction" text="add" />
                   <Label layoutX="22.0" layoutY="77.0" text="food intake:">
                      <font>
                         <Font size="18.0" />
@@ -34,14 +34,13 @@
                         <Font size="18.0" />
                      </font>
                   </Label>
-                  <Button fx:id="toggleViewButton" layoutX="556.0" layoutY="250.0" mnemonicParsing="false" onAction="#toggleViewButtonClicked" text="toggle view" />
                </children>
             </AnchorPane>
          </content>
       </Tab>
       <Tab fx:id="foodTab" text="food">
          <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="566.0" prefWidth="626.0">
                <children>
                   <ListView fx:id="foodLVFoodTab" layoutX="39.0" layoutY="24.0" onMouseClicked="#foodTabLVClicked" prefHeight="261.0" prefWidth="715.0" />
                   <TextField fx:id="searchFoodFieldFoodTab" layoutX="39.0" layoutY="306.0" onKeyReleased="#searchFoodFieldFoodTabKeyReleased" prefHeight="31.0" prefWidth="371.0" promptText="food" />
@@ -56,11 +55,6 @@
                   
                </children>
             </AnchorPane>
-         </content>
-      </Tab>
-      <Tab fx:id="untitledTab" text="Untitled Tab">
-         <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
          </content>
       </Tab>
    </tabs>

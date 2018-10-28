@@ -6,6 +6,7 @@
 package caloriescounter;
 
 import java.net.URL;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,8 +65,6 @@ public class CaloriesCounterController implements Initializable {
     private TextField proteinField;
     @FXML
     private Button cancelAddFoodButton;
-    @FXML
-    private Tab untitledTab;
     
     private DBConnection dbc = DBConnection.getInstance();
     @FXML
@@ -90,8 +89,6 @@ public class CaloriesCounterController implements Initializable {
     private boolean bwEntered = false;
     private Button dayViewButton;
     private Button allDaysButton;
-    @FXML
-    private Button toggleViewButton;
     private int year;
     private boolean dailyView = true;
     private ArrayList<String> datesAdded = new ArrayList<>();
@@ -105,20 +102,26 @@ public class CaloriesCounterController implements Initializable {
         dbc.connect();
         updateFoodLV();
         
-        int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        //add days to the day CB
         for (int i = 1; i < 32; i++) {
             dayCB.getItems().add(i);
         }
+        
+        //get the current day of the month
+        int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
         dayCB.setValue(day);
         
+        //add the months to the month CB
         String[] months = {"January", "February", "March", "April", "May",
-            "June", "July", "August", "September", "November", "October", "December"};
+            "June", "July", "August", "September", "November", "October",
+            "December"};
         int month = Calendar.getInstance().get(Calendar.MONTH);
         for (String s: months) {
             monthCB.getItems().add(s);
         }
         monthCB.setValue(months[month]);
         
+        //add years to the year cb
         year = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = 0; i < 11; i++) {
             yearCB.getItems().add(year - 5 + i);
@@ -127,13 +130,15 @@ public class CaloriesCounterController implements Initializable {
         
         updateFoodIntakeLV();
         
+        //set the buttons disabled so they cannot be clicked when values needed
+        //are not inserted
         addFoodButton.setDisable(true);
         cancelAddFoodButton.setDisable(true);
         deleteButton.setDisable(true);
         addButton.setDisable(true);
         cancelAddFoodButton.setDisable(true);
         
-        getDayView();
+       
     }    
 
     @FXML
@@ -150,6 +155,7 @@ public class CaloriesCounterController implements Initializable {
         calsField.clear();
         foodNameField.clear();
 
+        //create a new food object, add food the db and to the arraylist
         food = new Food(foodId++, foodName, fat, carbs, prot, cals);
         dbc.addFood(food);
         dbc.insertFood(foodName, fat, carbs, prot, cals);
@@ -168,18 +174,23 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void deleteButtonAction(ActionEvent event) {
-        String[] foodData = foodLVFoodTab.getSelectionModel().getSelectedItem().split(",");
+        //get the name and the amount of calories of the food to be deleted
+        String[] foodData = foodLVFoodTab.getSelectionModel().getSelectedItem()
+                .split(",");
         String[] calsTemp = foodData[1].split(" ");
 
         Food food = null;
         
+        //find the food to be deleted
         for (Food f: dbc.getFoods()) {
-            if ((f.getName().equals(foodData[0])) && (f.getCals() == Float.valueOf(calsTemp[1]))) {
+            if ((f.getName().equals(foodData[0])) && (f.getCals()
+                    == Float.valueOf(calsTemp[1]))) {
                 food = f;
                 break;
             }
         }
         
+        //delete food
         dbc.deleteFood(food);
         dbc.removeFood(food);
         
@@ -213,6 +224,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void searchFoodFieldFoodTabKeyReleased(KeyEvent event) {
+        //update the food listview when text is edited in the search food field
+        //on the food tab
         deleteButton.setDisable(true);
         foodLVFoodTab.getItems().clear();
         String s = searchFoodFieldFoodTab.getText();
@@ -237,6 +250,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void searchFoodKeyReleased(KeyEvent event) {
+        //update the food listview when text is edited in the search food field
+        //in the main tab
         foodLV.getItems().clear();
         String s = searchFoodField.getText();
         for (Food f: dbc.getFoods()) {
@@ -260,7 +275,9 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void addButtonAction(ActionEvent event) {
-        String[] foodData = foodLV.getSelectionModel().getSelectedItem().split(",");
+        //add food to the food intake
+        String[] foodData = foodLV.getSelectionModel().getSelectedItem()
+                .split(",");
         String foodName = foodData[0];
         int foodId = -1;
         int day = dayCB.getSelectionModel().getSelectedItem();
@@ -285,6 +302,8 @@ public class CaloriesCounterController implements Initializable {
             String[] columnData4 = foodData[4].split(" ");
             protein = Float.valueOf(columnData4[1]);
 
+            //get the food's id that matches to the name and the nutritional
+            //facts of the food selected from the food lv  
             if (f.getName().equals(foodData[0])
              && (f.getCals() == Float.valueOf(columnData1[1]))
                     && (f.getFat() == Float.valueOf(columnData2[1]))
@@ -306,6 +325,7 @@ public class CaloriesCounterController implements Initializable {
                                     year
         );
         
+        //make a new addition to the db and to the additions arraylist
         dbc.addAddition(a);
         dbc.insertAddition(day, month, year, foodId, amount);
         
@@ -314,13 +334,19 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void foodNameFieldKeyReleased(KeyEvent event) {
+        //listen to the events on the text field to decide whether it's
+        //ok or not to add a new food
         if (!foodNameField.getText().trim().isEmpty()) {
             foodNameOk = true;
         } else {
             foodNameOk = false;
         }
         
-        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+        if ((foodNameOk == true)
+                && (calsOk == true)
+                && (fatOk == true)
+                && (carbsOk == true)
+                && (proteinOk == true)) {
             addFoodButton.setDisable(false);
         } else {
             addFoodButton.setDisable(true);
@@ -329,6 +355,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void calsFieldKeyReleased(KeyEvent event) {
+        //listen to the events on the text field to decide whether it's
+        //ok or not to add a new food
         if (!calsField.getText().trim().isEmpty()
                 && Pattern.matches(pattern, calsField.getText())) {
             calsOk = true;
@@ -336,7 +364,11 @@ public class CaloriesCounterController implements Initializable {
             calsOk = false;
         }
         
-        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+        if ((foodNameOk == true)
+                && (calsOk == true)
+                && (fatOk == true)
+                && (carbsOk == true)
+                && (proteinOk == true)) {
             addFoodButton.setDisable(false);
         } else {
             addFoodButton.setDisable(true);
@@ -345,6 +377,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void fatFieldKeyReleased(KeyEvent event) {
+        //listen to the events on the text field to decide whether it's
+        //ok or not to add a new food
         if (!fatField.getText().trim().isEmpty()
                 && Pattern.matches(pattern, fatField.getText())) {
             fatOk = true;
@@ -352,7 +386,11 @@ public class CaloriesCounterController implements Initializable {
             fatOk = false;
         }
         
-        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+        if ((foodNameOk == true)
+                && (calsOk == true)
+                && (fatOk == true)
+                && (carbsOk == true)
+                && (proteinOk == true)) {
             addFoodButton.setDisable(false);
         } else {
             addFoodButton.setDisable(true);
@@ -361,6 +399,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void carbFieldKeyReleased(KeyEvent event) {
+        //listen to the events on the text field to decide whether it's
+        //ok or not to add a new food
         if (!carbField.getText().trim().isEmpty()
                 && Pattern.matches(pattern, carbField.getText())) {
             carbsOk = true;
@@ -368,7 +408,11 @@ public class CaloriesCounterController implements Initializable {
             carbsOk = false;
         }
         
-        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+        if ((foodNameOk == true)
+                && (calsOk == true)
+                && (fatOk == true)
+                && (carbsOk == true)
+                && (proteinOk == true)) {
             addFoodButton.setDisable(false);
         } else {
             addFoodButton.setDisable(true);
@@ -377,6 +421,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void proteinFieldKeyReleased(KeyEvent event) {
+        //listen to the events on the text field to decide whether it's
+        //ok or not to add a new food
         if (!proteinField.getText().trim().isEmpty()
                 && Pattern.matches(pattern, proteinField.getText())) {
             proteinOk = true;
@@ -384,7 +430,11 @@ public class CaloriesCounterController implements Initializable {
             proteinOk = false;
         }
         
-        if ((foodNameOk == true) && (calsOk == true) && (fatOk == true) && (carbsOk == true) && (proteinOk == true)) {
+        if ((foodNameOk == true)
+                && (calsOk == true)
+                && (fatOk == true)
+                && (carbsOk == true)
+                && (proteinOk == true)) {
             addFoodButton.setDisable(false);
         } else {
             addFoodButton.setDisable(true);
@@ -393,6 +443,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void cancelAddFoodButtonAction(ActionEvent event) {
+        //listen to the events on the text field to decide whether it's
+        //ok or not to add a new food
         dbc.removeFood(food);
         dbc.deleteFood(food);
         cancelAddFoodButton.setDisable(true);
@@ -405,15 +457,6 @@ public class CaloriesCounterController implements Initializable {
             deleteButton.setDisable(false);
         } else {
             deleteButton.setDisable(true);
-        }
-    }
-
-    private void bwFieldKeyReleased(KeyEvent event) {
-        if (!bwField.getText().trim().isEmpty() &&
-                Pattern.matches(pattern, bwField.getText())) {
-            bwButton.setDisable(false);
-        } else {
-            bwButton.setDisable(true);
         }
     }
 
@@ -434,6 +477,8 @@ public class CaloriesCounterController implements Initializable {
 
     @FXML
     private void amountFieldKeyReleased(KeyEvent event) {
+        //listen to the events on the text field to decide whether it's
+        //ok or not to make a new addition
         if (!amountField.getText().trim().isEmpty() &&
                 Pattern.matches(pattern, amountField.getText())) {
             amountEntered = true;
@@ -449,7 +494,7 @@ public class CaloriesCounterController implements Initializable {
     }
 
 
-
+    //update the food intake lv when the date changes
     @FXML
     private void dayCBAction(ActionEvent event) {
         updateFoodIntakeLV();
@@ -472,10 +517,14 @@ public class CaloriesCounterController implements Initializable {
         float totalFat = 0;
         float totalCarbs = 0;
         float totalProtein = 0;
+        
+        //get all the additions of food of the corresponding day
         for (Addition a: dbc.getAdditions()) {
             if ((a.getDay() == dayCB.getSelectionModel().getSelectedItem())
-                    && (a.getMonth() == monthCB.getSelectionModel().getSelectedIndex() + 1)
-                    && (a.getYear() == yearCB.getSelectionModel().getSelectedItem())) {
+                    && (a.getMonth() == monthCB.getSelectionModel()
+                            .getSelectedIndex() + 1)
+                    && (a.getYear() == yearCB.getSelectionModel()
+                            .getSelectedItem())) {
                 totalAmount += a.getAmount();
                 totalCals += a.getCal();
                 totalFat += a.getFat();
@@ -496,68 +545,5 @@ public class CaloriesCounterController implements Initializable {
                                 totalFat + "g fat, " +
                                 totalCarbs + "g carbs, " +
                                 totalProtein + "g prot");
-    }
-
-    @FXML
-    private void toggleViewButtonClicked(ActionEvent event) {
-        
-        // CHECK IF DAY HAS ALREADY BEEN ADDED
-        
-        if (dailyView) {
-            foodIntakeLV.getItems().clear();
-            for (String s: datesData) {
-                foodIntakeLV.getItems().add(s);
-            }
-            dailyView = false;
-        } else {
-            updateFoodIntakeLV();
-            dailyView = true;
-        }
-        
-        
-    }
-    
-    private void getDayView() {
-            float totalAmount = 0;
-            float totalCals = 0;
-            float totalFat = 0;
-            float totalCarbs = 0;
-            float totalProtein = 0;
-            for (Addition a: dbc.getAdditions()) {
-                int day = a.getDay();
-                int month = a.getMonth();
-                int year = a.getYear();
-                String date = day + "-" + month + "-" + year;
-                if (datesAdded.contains(date)) {
-                    continue;
-                }
-                datesAdded.add(date);
-
-                for (Addition ad: dbc.getAdditions()) {
-                    if ((ad.getDay() == day) && (ad.getMonth() == month) && (ad.getYear() == year)) {
-                        totalAmount += a.getAmount();
-                        totalCals += a.getCal();
-                        totalFat += a.getFat();
-                        totalCarbs += a.getCarbs();
-                        totalProtein += a.getProtein();
-                    }
-                }
-
-                datesData.add("Date: " +
-                            day + "-" + month + "-" + year + ", " +
-                            "total: " + 
-                            totalAmount + "g, " +
-                            totalCals + "cals, " +
-                            totalFat + "g fat, " +
-                            totalCarbs + "g carbs, " +
-                            totalProtein + "g prot");
-                
-                totalAmount = 0;
-                totalCals = 0;
-                totalFat = 0;
-                totalCarbs = 0;
-                totalProtein = 0;
-                }
-
     }
 }

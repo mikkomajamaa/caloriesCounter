@@ -42,7 +42,7 @@ public class DBConnection {
     public void connect() {
         try {
             //db parameters
-            String url = "jdbc:sqlite:C:\\Users\\mikko\\sqlite-tools-win32-x86-3240000\\asd";
+            String url = "jdbc:sqlite:CaloriesCounterDB";
             //create a connection to the database
             conn = DriverManager.getConnection(url);
         } catch (SQLException e) {
